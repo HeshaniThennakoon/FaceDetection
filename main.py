@@ -16,6 +16,13 @@ firebase_admin.initialize_app(cred,{
 })
 
 
+
+bucket = storage.bucket()
+# Check if the bucket exists
+
+
+
+
 cap = cv2.VideoCapture(0)
 cap.set(3, 640)
 cap.set(4, 480)
@@ -36,6 +43,7 @@ print("Encoded File Loaded")
 
 counter = 0
 id = -1
+imgStudent = []
 
 
 while True:
@@ -69,7 +77,7 @@ while True:
             # print(studentIds)
             # print("ID:", id)
 
-# Get student info from Firebase
+            # Get student info from Firebase
             if counter == 0:
                 counter = 1
                 # studentId = studentIds[matchIndex]
@@ -83,17 +91,31 @@ while True:
                         print("Student Info:", studentInfo)
 
 
+                        # Get the Image from Firebase Storage
+                        blob = bucket.get_blob(f'Images/{id}.jpeg')
+                        array = np.frombuffer(blob.download_as_string(), np.uint8)
+                        imgStudent = cv2.imdecode(array, cv2.COLOR_BGRA2BGR)
+                        # imgStudent = cv2.resize(imgStudent, (200, 200))
+
+
                         (w, h), _ = cv2.getTextSize(studentInfo['name'], cv2.FONT_HERSHEY_COMPLEX, 1, 1)
                         offset = (414 - w) // 2
-                        cv2.putText(imgBackground, str(studentInfo['name']), (808 + offset, 125), cv2.FONT_HERSHEY_COMPLEX, 0.8, (50, 50, 50), 1)
+                        cv2.putText(imgBackground, str(studentInfo['name']), (808 + offset, 100), cv2.FONT_HERSHEY_COMPLEX, 0.8, (50, 50, 50), 1)
 
-                        cv2.putText(imgBackground, str(studentInfo['regNo']), (750, 155), cv2.FONT_HERSHEY_COMPLEX, 0.8, (50, 50, 50), 1)
-                        cv2.putText(imgBackground, str(studentInfo['batch']), (750, 185), cv2.FONT_HERSHEY_COMPLEX, 0.7, (50, 50, 50), 1)
-                        cv2.putText(imgBackground, str(studentInfo['academicYear']), (1050, 185), cv2.FONT_HERSHEY_COMPLEX, 0.6, (50, 50, 50), 1)
-                        cv2.putText(imgBackground, str(studentInfo['department']), (750, 215), cv2.FONT_HERSHEY_COMPLEX, 0.6, (50, 50, 50), 1)
-                        cv2.putText(imgBackground, str(studentInfo['email']), (750, 245), cv2.FONT_HERSHEY_COMPLEX, 0.6, (50, 50, 50), 1)
-                        cv2.putText(imgBackground, str(studentInfo['phone']), (750, 275), cv2.FONT_HERSHEY_COMPLEX, 0.6, (50, 50, 50), 1)
-                        cv2.putText(imgBackground, str(studentInfo['address']), (750, 305), cv2.FONT_HERSHEY_COMPLEX, 0.5, (50, 50, 50), 1)                         
+                        cv2.putText(imgBackground, str(studentInfo['regNo']), (750, 470), cv2.FONT_HERSHEY_COMPLEX, 0.8, (50, 50, 50), 1)
+                        cv2.putText(imgBackground, str(studentInfo['batch']), (750, 500), cv2.FONT_HERSHEY_COMPLEX, 0.7, (50, 50, 50), 1)
+                        cv2.putText(imgBackground, str(studentInfo['academicYear']), (1050, 500), cv2.FONT_HERSHEY_COMPLEX, 0.6, (50, 50, 50), 1)
+                        cv2.putText(imgBackground, str(studentInfo['department']), (750, 530), cv2.FONT_HERSHEY_COMPLEX, 0.6, (50, 50, 50), 1)
+                        cv2.putText(imgBackground, str(studentInfo['email']), (750, 560), cv2.FONT_HERSHEY_COMPLEX, 0.6, (50, 50, 50), 1)
+                        cv2.putText(imgBackground, str(studentInfo['phone']), (750, 590), cv2.FONT_HERSHEY_COMPLEX, 0.6, (50, 50, 50), 1)
+                        cv2.putText(imgBackground, str(studentInfo['address']), (750, 620), cv2.FONT_HERSHEY_COMPLEX, 0.5, (50, 50, 50), 1)
+                        
+
+                        # Resize the student image
+                        imgStudent = cv2.resize(imgStudent, (216, 216))
+                        # Place the student image on the background
+                        imgBackground[175:175+216, 909:909+216] = imgStudent                       
+
 
                         counter += 1
 
