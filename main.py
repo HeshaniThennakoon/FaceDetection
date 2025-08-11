@@ -8,6 +8,13 @@ import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import db
 from firebase_admin import storage
+import time
+
+# Set cooldown periods
+last_detection_time = 0
+cooldown_seconds = 30
+last_detected_id = None
+
 
 cred = credentials.Certificate("serviceAccountKey.json")
 firebase_admin.initialize_app(cred,{
@@ -19,7 +26,6 @@ firebase_admin.initialize_app(cred,{
 
 bucket = storage.bucket()
 # Check if the bucket exists
-
 
 
 
@@ -67,57 +73,54 @@ while True:
         # print("match Index:", matchIndex)
 
         if matches[matchIndex]:
-            # print("Known Face Detected")
-            # print(studentIds[matchIndex])
-            y1, x2, y2, x1 = faceLoc
-            y1, x2, y2, x1 = y1 * 4, x2 * 4, y2 * 4, x1 * 4
-            bbox = 55 + x1, 162 + y1, x2 - x1, y2 - y1
-            imgBackground = cvzone.cornerRect(imgBackground, bbox, rt=0)
-            id = studentIds[matchIndex]
-            # print(studentIds)
-            # print("ID:", id)
+            current_time = time.time()
 
-            # Get student info from Firebase
-            if counter == 0:
-                counter = 1
-                # studentId = studentIds[matchIndex]
-                # print("Student ID:", studentId)
+            # New person OR cooldown expired
+            if (current_time - last_detection_time > cooldown_seconds) or (last_detected_id != studentIds[matchIndex]):
 
-                if counter!= 0:
+                last_detection_time = current_time
+                last_detected_id = studentIds[matchIndex]
+                id = studentIds[matchIndex]
 
-                    if counter == 1:
-                        # Get the Data from Firebase
-                        studentInfo = db.reference(f'Students/{id}').get()
-                        print("Student Info:", studentInfo)
+                # Draw face rectangle
+                y1, x2, y2, x1 = faceLoc
+                y1, x2, y2, x1 = y1 * 4, x2 * 4, y2 * 4, x1 * 4
+                bbox = 55 + x1, 162 + y1, x2 - x1, y2 - y1
+                imgBackground = cvzone.cornerRect(imgBackground, bbox, rt=0)
 
+                # Clear old student info area
+                imgBackground[100:720, 700:1280] = (255, 255, 255)  # white area
 
-                        # Get the Image from Firebase Storage
-                        blob = bucket.get_blob(f'Images/{id}.jpeg')
-                        array = np.frombuffer(blob.download_as_string(), np.uint8)
-                        imgStudent = cv2.imdecode(array, cv2.COLOR_BGRA2BGR)
-                        # imgStudent = cv2.resize(imgStudent, (200, 200))
+                # Show "Loading..." before fetching data
+                cvzone.putTextRect(imgBackground, "Loading...", (275, 400))
+                cv2.imshow("Face Detection", imgBackground)
+                cv2.waitKey(1)
 
+                # Fetch student data
+                studentInfo = db.reference(f'Students/{id}').get()
+                print("Student Info:", studentInfo)
 
-                        (w, h), _ = cv2.getTextSize(studentInfo['name'], cv2.FONT_HERSHEY_COMPLEX, 1, 1)
-                        offset = (414 - w) // 2
-                        cv2.putText(imgBackground, str(studentInfo['name']), (808 + offset, 100), cv2.FONT_HERSHEY_COMPLEX, 0.8, (50, 50, 50), 1)
+                # Fetch image from Firebase Storage
+                blob = bucket.get_blob(f'Images/{id}.jpeg')
+                array = np.frombuffer(blob.download_as_string(), np.uint8)
+                imgStudent = cv2.imdecode(array, cv2.COLOR_BGRA2BGR)
 
-                        cv2.putText(imgBackground, str(studentInfo['regNo']), (750, 470), cv2.FONT_HERSHEY_COMPLEX, 0.8, (50, 50, 50), 1)
-                        cv2.putText(imgBackground, str(studentInfo['batch']), (750, 500), cv2.FONT_HERSHEY_COMPLEX, 0.7, (50, 50, 50), 1)
-                        cv2.putText(imgBackground, str(studentInfo['academicYear']), (1050, 500), cv2.FONT_HERSHEY_COMPLEX, 0.6, (50, 50, 50), 1)
-                        cv2.putText(imgBackground, str(studentInfo['department']), (750, 530), cv2.FONT_HERSHEY_COMPLEX, 0.6, (50, 50, 50), 1)
-                        cv2.putText(imgBackground, str(studentInfo['email']), (750, 560), cv2.FONT_HERSHEY_COMPLEX, 0.6, (50, 50, 50), 1)
-                        cv2.putText(imgBackground, str(studentInfo['phone']), (750, 590), cv2.FONT_HERSHEY_COMPLEX, 0.6, (50, 50, 50), 1)
-                        cv2.putText(imgBackground, str(studentInfo['address']), (750, 620), cv2.FONT_HERSHEY_COMPLEX, 0.5, (50, 50, 50), 1)
-                        
+                # Display text info
+                (w, h), _ = cv2.getTextSize(studentInfo['name'], cv2.FONT_HERSHEY_COMPLEX, 1, 1)
+                offset = (414 - w) // 2
+                cv2.putText(imgBackground, str(studentInfo['name']), (808 + offset, 120), cv2.FONT_HERSHEY_COMPLEX, 0.8, (50, 50, 50), 1)
+                cv2.putText(imgBackground, str(studentInfo['regNo']), (750, 470), cv2.FONT_HERSHEY_COMPLEX, 0.8, (50, 50, 50), 1)
+                cv2.putText(imgBackground, str(studentInfo['batch']), (750, 500), cv2.FONT_HERSHEY_COMPLEX, 0.7, (50, 50, 50), 1)
+                cv2.putText(imgBackground, str(studentInfo['academicYear']), (1050, 500), cv2.FONT_HERSHEY_COMPLEX, 0.6, (50, 50, 50), 1)
+                cv2.putText(imgBackground, str(studentInfo['department']), (750, 530), cv2.FONT_HERSHEY_COMPLEX, 0.6, (50, 50, 50), 1)
+                cv2.putText(imgBackground, str(studentInfo['email']), (750, 560), cv2.FONT_HERSHEY_COMPLEX, 0.6, (50, 50, 50), 1)
+                cv2.putText(imgBackground, str(studentInfo['phone']), (750, 590), cv2.FONT_HERSHEY_COMPLEX, 0.6, (50, 50, 50), 1)
+                cv2.putText(imgBackground, str(studentInfo['address']), (750, 620), cv2.FONT_HERSHEY_COMPLEX, 0.5, (50, 50, 50), 1)
 
-                        # Resize the student image
-                        imgStudent = cv2.resize(imgStudent, (216, 216))
-                        # Place the student image on the background
-                        imgBackground[175:175+216, 909:909+216] = imgStudent                       
-
-
-                        counter += 1
+                # Display student image
+                imgStudent = cv2.resize(imgStudent, (216, 216))
+                imgBackground[175:175+216, 909:909+216] = imgStudent
+                
 
 
     #cv2.imshow("Webcam", img)
