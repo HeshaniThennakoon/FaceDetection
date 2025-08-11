@@ -20,7 +20,7 @@ data = {
         "phone": "075-8167490",
         "address": "C/107, Ahambadeniya Road, Dewalegama, Sri Lanka",
         "department": "Computer Engineering",
-        "batch": "22",
+        "batch": "22nd Batch",
         "academicYear": "2019/2020"
 
     },
@@ -33,7 +33,7 @@ data = {
         "phone": "077-6271913",
         "address": "C/107, 2nd Lane, Galle, Sri Lanka",
         "department": "Computer Engineering",
-        "batch": "22",
+        "batch": "22nd Batch",
         "academicYear": "2019/2020"
 
     }

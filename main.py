@@ -69,7 +69,6 @@ while True:
             # print(studentIds)
             # print("ID:", id)
 
-
 # Get student info from Firebase
             if counter == 0:
                 counter = 1
@@ -79,11 +78,22 @@ while True:
                 if counter!= 0:
 
                     if counter == 1:
+                        # Get the Data from Firebase
                         studentInfo = db.reference(f'Students/{id}').get()
                         print("Student Info:", studentInfo)
 
 
+                        (w, h), _ = cv2.getTextSize(studentInfo['name'], cv2.FONT_HERSHEY_COMPLEX, 1, 1)
+                        offset = (414 - w) // 2
+                        cv2.putText(imgBackground, str(studentInfo['name']), (808 + offset, 125), cv2.FONT_HERSHEY_COMPLEX, 0.8, (50, 50, 50), 1)
 
+                        cv2.putText(imgBackground, str(studentInfo['regNo']), (750, 155), cv2.FONT_HERSHEY_COMPLEX, 0.8, (50, 50, 50), 1)
+                        cv2.putText(imgBackground, str(studentInfo['batch']), (750, 185), cv2.FONT_HERSHEY_COMPLEX, 0.7, (50, 50, 50), 1)
+                        cv2.putText(imgBackground, str(studentInfo['academicYear']), (1050, 185), cv2.FONT_HERSHEY_COMPLEX, 0.6, (50, 50, 50), 1)
+                        cv2.putText(imgBackground, str(studentInfo['department']), (750, 215), cv2.FONT_HERSHEY_COMPLEX, 0.6, (50, 50, 50), 1)
+                        cv2.putText(imgBackground, str(studentInfo['email']), (750, 245), cv2.FONT_HERSHEY_COMPLEX, 0.6, (50, 50, 50), 1)
+                        cv2.putText(imgBackground, str(studentInfo['phone']), (750, 275), cv2.FONT_HERSHEY_COMPLEX, 0.6, (50, 50, 50), 1)
+                        cv2.putText(imgBackground, str(studentInfo['address']), (750, 305), cv2.FONT_HERSHEY_COMPLEX, 0.5, (50, 50, 50), 1)                         
 
                         counter += 1
 
