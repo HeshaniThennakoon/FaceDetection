@@ -36,6 +36,42 @@ data = {
         "batch": "22nd Batch",
         "academicYear": "2019/2020"
 
+    },
+
+    "EG_2019_3555":
+    {
+        "name": "R.H.S.Darshana",
+        "regNo": "EG_2019_3555",
+        "email": "samithdarshana49@gmail.com",
+        "phone": "077-0215160",
+        "address": "70/B, Anuradapura, Sri Lanka",
+        "department": "Computer Engineering",
+        "batch": "21st Batch",
+        "academicYear": "2018/2019"
+    },
+
+    "EG_2019_3717":
+    {
+        "name": "R.M.K.N.Rathnayaka",
+        "regNo": "EG_2019_3717",
+        "email": "nimeshrathnayaka10@gmail.com",
+        "phone": "070-5891312",
+        "address": "Mawanella, Kegalle, Sri Lanka",
+        "department": "Marine Engineering and Naval Architecture",
+        "batch": "21st Batch",
+        "academicYear": "2018/2019"
+    },
+
+    "EG_2019_3709":
+    {
+        "name": "R.I.M.Rajapaksha",
+        "regNo": "EG_2019_3709",
+        "email": "ishaararajapaksha@gmail.com",
+        "phone": "077-5385995",
+        "address": "Serumure, Keththapahuwa, Ambanpola, Sri Lanka",
+        "department": "Marine Engineering and Naval Architecture",
+        "batch": "21st Batch",
+        "academicYear": "2018/2019"
     }
 
 

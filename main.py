@@ -72,6 +72,7 @@ while True:
         matchIndex = np.argmin(faceDis)
         # print("match Index:", matchIndex)
 
+        # Known person
         if matches[matchIndex]:
             current_time = time.time()
 
@@ -121,6 +122,19 @@ while True:
                 imgStudent = cv2.resize(imgStudent, (216, 216))
                 imgBackground[175:175+216, 909:909+216] = imgStudent
                 
+        # Unknown Person 
+        else:
+            # Draw face rectangle
+            y1, x2, y2, x1 = faceLoc
+            y1, x2, y2, x1 = y1 * 4, x2 * 4, y2 * 4, x1 * 4
+            bbox = 55 + x1, 162 + y1, x2 - x1, y2 - y1
+            imgBackground = cvzone.cornerRect(imgBackground, bbox, rt=0, colorC=(0,0,255))
+
+            # clear old student info area
+            imgBackground[100:720, 700:1280] = (255, 255, 255)
+
+            # Show error message
+            cvzone.putTextRect(imgBackground, "Error : Unknown Person!", (750, 300), scale=1, thickness=2, colorR=(0, 0, 255), offset=10)
 
 
     #cv2.imshow("Webcam", img)
