@@ -8,15 +8,14 @@ firebase_admin.initialize_app(cred,{
 })
 
 
-ref = db.reference('Students')
-
+ref = db.reference('Student')
 
 data = {
     "EG_2020_4346":
     {
         "name": "G.H.M.Thennakoon",
         "regNo": "EG_2020_4346",
-        "email": "thennakoonghm@gmail.com",
+        "email": "heshanithennakoon118@gmail.com",
         "phone": "075-8167490",
         "address": "C/107, Ahambadeniya Road, Dewalegama, Sri Lanka",
         "department": "Computer Engineering",
@@ -73,13 +72,11 @@ data = {
         "batch": "21st Batch",
         "academicYear": "2018/2019"
     }
-
-
 }
+
+ref = db.reference('Teacher')
+
 
 
 for key, value in data.items():
     ref.child(key).set(value)
-
-
-

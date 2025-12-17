@@ -1,34 +1,28 @@
 import cv2
 import pickle
 import face_recognition
-import os
 import numpy as np
 import cvzone
 import firebase_admin
-from firebase_admin import credentials
-from firebase_admin import db
-from firebase_admin import storage
+from firebase_admin import credentials, db, storage
 import time
+import json
 
 # Set cooldown periods
 last_detection_time = 0
 cooldown_seconds = 30
 last_detected_id = None
 
-
+# Firebase INIT
 cred = credentials.Certificate("serviceAccountKey.json")
 firebase_admin.initialize_app(cred,{
     'databaseURL':"https://facedetection-5274a-default-rtdb.asia-southeast1.firebasedatabase.app/",
     'storageBucket':"facedetection-5274a.firebasestorage.app"
 })
 
-
-
 bucket = storage.bucket()
-# Check if the bucket exists
 
-
-
+# Camera setup
 cap = cv2.VideoCapture(0)
 cap.set(3, 640)
 cap.set(4, 480)
@@ -54,6 +48,8 @@ imgStudent = []
 
 while True:
     success, img = cap.read()
+    if not success:
+        break
 
     imgS = cv2.resize(img, (0, 0), None, 0.25, 0.25)
     imgS = cv2.cvtColor(imgS, cv2.COLOR_BGR2RGB)
@@ -91,6 +87,39 @@ while True:
 
                 # Clear old student info area
                 imgBackground[100:720, 700:1280] = (255, 255, 255)  # white area
+
+                # Fetch student data
+                studentInfo = db.reference(f"Students/{last_detected_id}").get()
+
+                if not studentInfo or "email" not in studentInfo:
+                    continue
+
+                # Save email temporarily
+                with open("detected_student.json", "w") as f:
+                    json.dump({
+                        "email": studentInfo["email"],
+                        "timestamp": time.time()
+                    }, f)
+
+                print("Detected Email:", studentInfo["email"])
+
+                # SHOW SUCCESS
+                cvzone.putTextRect(
+                    imgBackground,
+                    "Face Recognized",
+                    (275, 400),
+                    scale=2,
+                    thickness=2,
+                    colorR=(0, 255, 0)
+                )
+
+                cv2.imshow("Face Detection", imgBackground)
+                cv2.waitKey(1500)
+
+                # CLEAN EXIT
+                cap.release()
+                cv2.destroyAllWindows()
+                exit()
 
                 # Show "Loading..." before fetching data
                 cvzone.putTextRect(imgBackground, "Loading...", (275, 400))
