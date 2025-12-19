@@ -7,9 +7,11 @@ firebase_admin.initialize_app(cred,{
     'databaseURL':"https://facedetection-5274a-default-rtdb.asia-southeast1.firebasedatabase.app/"
 })
 
-
+# Reference to the database
 ref = db.reference('Student')
+teacher_ref = db.reference('Teacher')
 
+# Student data to add
 data = {
     "EG_2020_4346":
     {
@@ -21,7 +23,6 @@ data = {
         "department": "Computer Engineering",
         "batch": "22nd Batch",
         "academicYear": "2019/2020"
-
     },
 
     "EG_2020_4343":
@@ -34,7 +35,6 @@ data = {
         "department": "Computer Engineering",
         "batch": "22nd Batch",
         "academicYear": "2019/2020"
-
     },
 
     "EG_2019_3555":
@@ -74,9 +74,30 @@ data = {
     }
 }
 
-ref = db.reference('Teacher')
-
-
+# Teacher data to add
+teacher_data = {
+    "TCH_001": {
+        "teacherName": "A.B.C.Perera",
+        "teacherID": "TCH_001",
+        "teacher_email": "abcperera@university.edu",
+        "teacher_phone": "071-1234567",
+        "department": "Computer Engineering",
+        "position": "Senior Lecturer"
+    },
+    "TCH_002": {
+        "teacherName": "D.E.F.Kumara",
+        "teacherID": "TCH_002",
+        "teacher_email": "defkumara@university.edu",
+        "teacher_phone": "072-7654321",
+        "department": "Marine Engineering",
+        "position": "Professor"
+    }
+}
 
 for key, value in data.items():
     ref.child(key).set(value)
+
+for key, value in teacher_data.items():
+    teacher_ref.child(key).set(value)
+
+print("Data added to Firebase Realtime Database.")

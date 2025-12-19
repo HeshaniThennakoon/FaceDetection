@@ -81,7 +81,7 @@ while True:
                 imgBackground[100:720, 700:1280] = (255, 255, 255)
 
                 # Fetch student info from Firebase
-                studentInfo = db.reference(f"Students/{id}").get()
+                studentInfo = db.reference(f"Student/{id}").get()
                 if not studentInfo or "email" not in studentInfo:
                     continue
 

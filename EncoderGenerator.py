@@ -13,12 +13,8 @@ firebase_admin.initialize_app(cred,{
     'storageBucket':"facedetection-5274a.firebasestorage.app"
 })
 
-
-
-
-
 #importing students images
-folderPath = 'Images'
+folderPath = 'Images/Student'
 pathList = os.listdir(folderPath)
 print(pathList)
 imgList = []
